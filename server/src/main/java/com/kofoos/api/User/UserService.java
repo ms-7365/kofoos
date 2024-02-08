@@ -1,18 +1,17 @@
 package com.kofoos.api.User;
 
+import com.kofoos.api.User.dto.ProductDto;
+import com.kofoos.api.entity.*;
 import com.kofoos.api.repository.HistoryRepository;
 import com.kofoos.api.repository.UserDislikesMaterialRepository;
-import com.kofoos.api.common.dto.HistoryDto;
 import com.kofoos.api.User.dto.MyPageDto;
-import com.kofoos.api.entity.DislikedMaterial;
-import com.kofoos.api.entity.User;
-import com.kofoos.api.entity.UserDislikesMaterial;
 import com.kofoos.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.kofoos.api.repository.DislikedMaterialRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +23,7 @@ public class UserService {
     private final DislikedMaterialRepository dislikedMaterialRepository;
     private final HistoryRepository historyRepository;
 
-    public void registerUser(User user){
+    public void registerUser(User user) {
         userRepository.save(user);
     }
 
@@ -82,7 +81,6 @@ public class UserService {
     }
 
 
-
     //회원 삭제
     public void deleteUser(int userId) {
         User user = userRepository.findById(userId)
@@ -96,27 +94,35 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         String language = user.getLanguage();
-        System.out.println("언어정보:"+language);
+        System.out.println("언어정보:" + language);
 
         // 비선호 식재료 ID 목록 조회
         List<Integer> dislikedMaterials = userDislikesMaterialsRepo.findByUserId(userId).stream()
                 .map(udm -> udm.getDislikedMaterial().getId()) // material_id를 직접 사용
                 .collect(Collectors.toList());
 
-        // 히스토리 변환 (최근 10개, 중복 제거)
-        List<HistoryDto> histories = historyRepository.findTop10ByUserIdOrderByViewTimeDesc(userId).stream()
+        // 히스토리 변환하여 ProductDto 리스트 생성
+        List<ProductDto> products = historyRepository.findTop10ByUserIdOrderByViewTimeDesc(userId).stream()
                 .distinct()
-                .map(history -> HistoryDto.of(history))
+                .map(history -> {
+                    Product product = history.getProduct();
+                    String imageUrl = product.getImage() != null ? product.getImage().getImgUrl() : null; // Image 엔티티가 null이 아닐 경우 URL 추출
+                    return ProductDto.builder()
+                            .productItemNo(product.getItemNo())
+                            .productUrl(imageUrl)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
-        List<String> products = histories.stream()
-                .map(historyDto -> historyDto.getProductUrl())
-                .collect(Collectors.toList());
+        return MyPageDto.builder()
+                .language(language)
+                .dislikedMaterials(dislikedMaterials)
+                .products(products) // ProductDto 리스트 전달
+                .build();
 
-        return new MyPageDto(language, dislikedMaterials, products);
     }
 
-    public int getUserId(String deviceId){
+    public int getUserId(String deviceId) {
         return userRepository.findUserIdByDeviceId(deviceId).getId();
     }
 

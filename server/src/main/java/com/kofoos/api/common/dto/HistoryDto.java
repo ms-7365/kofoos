@@ -29,7 +29,7 @@ public class HistoryDto {
         this.user = user;
         this.productUrl = productUrl;
         this.deviceId = deviceId;
-        ItemNo = itemNo;
+        this.ItemNo = itemNo;
     }
 
     public HistoryDto(int id, LocalDateTime viewTime, int user, String productUrl) {
@@ -49,6 +49,7 @@ public class HistoryDto {
                 .ItemNo(history.getProduct().getItemNo())
                 .build();
     }
+
 
 
 }
