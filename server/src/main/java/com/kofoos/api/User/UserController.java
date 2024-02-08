@@ -26,7 +26,7 @@ public class UserController {
 
     //유저 등록
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user){
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (userService.isUserAlreadyRegistered(user.getDeviceId())) { //이미 등록된 유저인지 확인
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User already registered.");
         }
