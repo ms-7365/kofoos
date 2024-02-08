@@ -13,7 +13,7 @@ class MyPageNotifier with ChangeNotifier {
     fetchMyPageInfo(14); // 유저 ID는 동적으로 설정해야 함
   }
 
-  void fetchMyPageInfo(int userId) async {
+  void fetchMyPageInfo(int userId) async
     try {
       myPageInfo = await _api.fetchMyPageInfo(userId);
       notifyListeners();

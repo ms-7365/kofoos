@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:kofoos/src/pages/mypage/dto/ProductDto.dart';
 import 'package:kofoos/src/pages/mypage/func/users_delete_func.dart';
 import 'package:kofoos/src/pages/mypage/func/users_update_lang_func.dart';
@@ -10,6 +11,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../register/select_food.dart';
 import 'mypage_notifier.dart';
+
 
 class Mypage extends StatefulWidget {
   const Mypage({Key? key}) : super(key: key);
@@ -69,7 +71,9 @@ class _MypageState extends State<Mypage> {
         children: [
           Container(
             height: 70,
+
             color: const Color(0xff343F56),
+
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -91,7 +95,9 @@ class _MypageState extends State<Mypage> {
                   TextButton(
                     onPressed: () {
                       // 유저 회원탈퇴 api
+
                       usersDeleteFunc(context,29);
+
                     },
                     child: const Text(
                       'Delete Account',
@@ -116,6 +122,7 @@ class _MypageState extends State<Mypage> {
             color: Colors.white,
             child: Row(
               children: [
+
                 Expanded(
                   child: ListTile(
                     title: const Text('Language',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700)),

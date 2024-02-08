@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kofoos/src/common/back_button_widget.dart';
 
 class HomeEditorPage3 extends StatelessWidget {
   const HomeEditorPage3({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class HomeEditorPage3 extends StatelessWidget {
           SingleChildScrollView(
             child: Column(
               children: [
-                Text('먹태깡 - HomeEditorPage3'),
+
                 Container(
                   child: Image.asset('assets/editor/e2.jpg'),
                 ),
@@ -22,22 +23,10 @@ class HomeEditorPage3 extends StatelessWidget {
                   child: Image.asset('assets/editor/e2.jpg'),
                 ),
               ],
+
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 30.0, right: 30.0),
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back),
-                backgroundColor: Color(0xffECECEC),
-                foregroundColor: Color(0xff343F56),
-              ),
-            ),
-          ),
+          BackButtonWidget(),
         ],
       ),
     );

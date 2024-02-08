@@ -22,7 +22,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+
       home: StartApp(), //Root(), StartApp()으로 변경하여 앱 시작점을 변경할 수 있습니다.
+
     );
   }
 }
