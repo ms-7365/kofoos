@@ -64,14 +64,25 @@ class ImageScan  {
       try {
         List<ResultObjectDetection> detectionResults = await _objectModelYoloV8!.getImagePrediction(
             await image.readAsBytes(),
-            minimumScore: 0.1,
+            minimumScore: 0.3,
             iOUThreshold: 0.3);
-        results.addAll(detectionResults);
+        if (detectionResults.isNotEmpty) {
+
+          results.add(detectionResults[0]);
+          print('=====결과값이 있을 때 결과 개수: ${results.length}====');
+        } else {
+          results.add(null); // 비어 있는 결과인 경우 null 추가
+          print('=====결과값이 없을 때 결과 개수: ${results.length}====');
+        }
+        print('=====if문 나와서 결과 개수: ${results.length}====');
+        print(detectionResults);
       } catch (e) {
         print("Object detection failed for image: ${image.path}, Error: $e");
         results.add(null); // 실패한 경우 null 추가
+        print('===== catch문 결과 개수: ${results.length}====');
       }
     }
+
     return results;
   }
   String inferenceTimeAsString(Stopwatch stopwatch) =>

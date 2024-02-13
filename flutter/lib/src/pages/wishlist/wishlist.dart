@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kofoos/src/pages/wishlist/api/model/WishlistDto.dart';
 import 'package:pytorch_lite/pigeon.dart';
 
 import '../../root/root_controller.dart';
 import 'ImageScan.dart';
+import 'WishlistDetectionDto.dart';
 import 'api/model/FolderDto.dart';
 import 'api/wishlist_api.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +29,8 @@ class _WishlistState extends State<Wishlist> {
   bool _isEditing = false; // 편집 모드 상태를 관리하는 변수
   List<String> _imagePaths = []; // 이미지 파일 경로를 저장할 리스트
   ImageScan imageScan = ImageScan();
-
+  List<ResultObjectDetection>? results;
+  List<WishlistDetectionDto>? wishlistDetections = null;
 
   @override
   void initState() {
@@ -87,26 +90,88 @@ class _WishlistState extends State<Wishlist> {
     }
   }
 
-
-
   Future<void> _pickImages() async {
     final ImagePicker picker = ImagePicker();
     final List<XFile>? images = await picker.pickMultiImage();
 
-
-
     if (images != null) {
       List<File> imageFiles = images.map((xFile) => File(xFile.path)).toList();
-      List<ResultObjectDetection?> results = await imageScan.runObjectDetectionYoloV8(imageFiles);
+      results = (await imageScan.runObjectDetectionYoloV8(imageFiles)).cast<ResultObjectDetection>();
       // 여기에서 results를 처리합니다. 예를 들어 콘솔에 출력할 수 있습니다.
-      for (var result in results) {
-        if (result != null) {
-          print("진단 객체 ${result.className} 점수: ${result.score}");
-        } else {
-          print("실패용");
+
+      print('이미지 크기');
+      print('${imageFiles.length}');
+      print('${results?.length}');
+      int index = 0;
+      List<WishlistDetectionDto> items = [];
+      for (var result in results!) {
+
+        if (result.score > 0.75) {
+          String? itemNo = result.className?.split("_")[0];
+          String imageUrl = images[index].path;
+
+          WishlistDetectionDto item = WishlistDetectionDto(itemNo: itemNo!, imageUrl: imageUrl);
+          items.add(item);
+          index++;
+          continue;
         }
+        WishlistDetectionDto item = WishlistDetectionDto(itemNo: null, imageUrl: images[index].path);
+        items.add(item);
+        index++;
       }
+      setState(() {
+        wishlistDetections = items;
+      });
     }
+
+  }
+
+  List<Widget> _buildCarouselItems() {
+
+    List<Widget> carouselItems = wishlistDetections?.map((wishlistDetection) {
+      return Container(
+        margin: EdgeInsets.all(5.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          child: Stack(
+            children: <Widget>[
+              Image.file(File(wishlistDetection.imageUrl), fit: BoxFit.cover, width: 1000.0),
+              Positioned(
+                bottom: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  child: Text(
+                    'No: ${wishlistDetection.itemNo ?? "Unknown"}, Image: ${wishlistDetection.imageUrl}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    })?.toList() ?? [];
+
+    // "이미지 업로드" 버튼을 마지막 항목으로 추가
+    carouselItems.add(_buildPhotoUploadWidget());
+
+    return carouselItems;
+  }
+
+
+  Widget _buildCarouselSlider() {
+    return CarouselSlider(
+      options: CarouselOptions(
+        // ... 옵션 설정 ...
+      ),
+      items: _buildCarouselItems(),
+    );
   }
 
   Widget _buildPhotoUploadWidget() {
@@ -262,8 +327,7 @@ class _WishlistState extends State<Wishlist> {
   Widget _wishlistWidget(BuildContext context) {
     return Column(
       children: [
-
-        _buildPhotoUploadWidget(),
+        _buildCarouselSlider(),
         Stack(
           children: [
             Card(
