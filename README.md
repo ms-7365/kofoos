@@ -112,11 +112,11 @@ AI
 
 <table>
   <tr>
-    <td>팀장</td>
-    <td>팀원</td>
-    <td>팀원</td>
-    <td>팀원</td>
-    <td>팀원</td>
+    <td>팀장(FE)</td>
+    <td>팀원(AI,BE)</td>
+    <td>팀원(FE,BE)</td>
+    <td>팀원(FE,BE)</td>
+    <td>팀원(FE,BE,인프라)</td>
   </tr>
   <tr>
     <td>권정훈</td>
